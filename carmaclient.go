@@ -1,15 +1,15 @@
 package carmaclient
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	"bytes"
-	"encoding/json"
 	"github.com/moonwalker/logger"
-	"errors"
 )
 
 const (
@@ -80,6 +80,7 @@ func (c CarmaClient) catchError(carmaResp *carmaResponse) {
 }
 
 func (c CarmaClient) carmaRequest(endpoint string, method string, body interface{}) (carmaResp carmaResponse) {
+	carmaResp.err = nil
 	logRequest := make(map[string]interface{})
 	logResponse := make(map[string]interface{})
 
@@ -131,7 +132,9 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 	respBody, err := ioutil.ReadAll(resp.Body)
 	carmaResp.err = err
 	carmaResp.data = respBody
-	c.catchError(&carmaResp)
+	if carmaResp.err != nil {
+		c.catchError(&carmaResp)
+	}
 
 	logResponse["Response"] = string(respBody)
 
