@@ -2,9 +2,9 @@ package carmaclient
 
 import (
 	"encoding/json"
-	"net/http"
-	"fmt"
 	"errors"
+	"fmt"
+	"net/http"
 
 	"github.com/moonwalker/carmaclient/dto"
 )
