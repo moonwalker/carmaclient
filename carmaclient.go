@@ -133,7 +133,7 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 	}
 
 	var jsonResp interface{}
-	err = json.Unmarshal(respBody, jsonResp)
+	err = json.Unmarshal(respBody, &jsonResp)
 	if err == nil {
 		logData["Response"] = respBody
 	}
