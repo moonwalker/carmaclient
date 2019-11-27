@@ -86,6 +86,7 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 	url := fmt.Sprintf("%s/%d/%s", c.carmaRESTURL, c.carmaOrganization, endpoint)
 	logData["query"] = endpoint
 	logData["URL"] = url
+	logData["Body"] = body
 
 	client := http.Client{
 		Timeout: 10 * time.Second,
@@ -94,11 +95,6 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 	b := new(bytes.Buffer)
 	if body != nil {
 		json.NewEncoder(b).Encode(body)
-	}
-
-	jsonBody, err := json.Marshal(body)
-	if err == nil {
-		logData["Body"] = string(jsonBody)
 	}
 
 	req, err := http.NewRequest(method, url, b)
@@ -136,7 +132,11 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 		c.catchError(&carmaResp)
 	}
 
-	logData["Response"] = string(respBody)
+	var jsonResp interface{}
+	err = json.Unmarshal(respBody, jsonResp)
+	if err == nil {
+		logData["Response"] = respBody
+	}
 	logData["StatusCode"] = resp.StatusCode
 
 	if c.log != nil {
