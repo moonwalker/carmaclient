@@ -3,10 +3,10 @@ package carmaclient
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/moonwalker/carmaclient/dto"
 	"fmt"
 	"errors"
+
+	"github.com/moonwalker/carmaclient/dto"
 )
 
 type TriggersService service
@@ -16,8 +16,6 @@ func (s *TriggersService) GetTrigger(triggerID int64) (*dto.TriggerDTO, error) {
 	if response.err != nil {
 		return nil, response.err
 	}
-
-	fmt.Println(string(response.data))
 
 	responseDTO := &dto.TriggerDTO{}
 
@@ -34,8 +32,6 @@ func (s *TriggersService) GetTriggers() (*[]dto.TriggerDTO, error) {
 	if response.err != nil {
 		return nil, response.err
 	}
-
-	fmt.Println(string(response.data))
 
 	responseDTO := &[]dto.TriggerDTO{}
 

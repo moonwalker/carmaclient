@@ -16,8 +16,6 @@ func (s *PropertiesService) GetProperties() (*[]dto.PropertyDTO, error) {
 		return nil, response.err
 	}
 
-	fmt.Println(string(response.data))
-
 	responseDTO := &[]dto.PropertyDTO{}
 
 	err := json.Unmarshal(response.data, responseDTO)

@@ -81,8 +81,9 @@ func (c CarmaClient) catchError(carmaResp *carmaResponse) {
 
 func (c CarmaClient) carmaRequest(endpoint string, method string, body interface{}) (carmaResp carmaResponse) {
 	carmaResp.err = nil
-	logRequest := make(map[string]interface{})
-	logResponse := make(map[string]interface{})
+	logData := make(map[string]interface{})
+	logData["query"] = endpoint
+	logData["URL"] = url
 
 	client := http.Client{
 		Timeout: 10 * time.Second,
@@ -97,12 +98,16 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 
 	logData, err := json.Marshal(body)
 	if err == nil {
-		logRequest["Body"] = string(logData)
+		logData["Body"] = string(logData)
 	}
 
 	req, err := http.NewRequest(method, url, b)
 	if err != nil {
 		carmaResp.err = err
+		if c.log != nil {
+			logData["error"] = err
+			c.log.Info("Carma Request", logRequest)
+		}
 		return
 	}
 
@@ -110,18 +115,13 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 	req.Header["Accept"] = []string{"application/json"}
 	req.Header["Content-Type"] = []string{"application/json"}
 
-	logResponse["query"] = endpoint
-	logRequest["query"] = endpoint
-
-	logRequest["URL"] = url
-
-	if c.log != nil {
-		c.log.Info("Carma Request", logRequest)
-	}
-
 	resp, err := client.Do(req)
 	if err != nil {
 		carmaResp.err = err
+		if c.log != nil {
+			logData["error"] = err
+			c.log.Info("Carma Request", logRequest)
+		}
 		return
 	}
 
@@ -136,13 +136,11 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 		c.catchError(&carmaResp)
 	}
 
-	logResponse["Response"] = string(respBody)
-
-	logResponse["StatusCode"] = resp.StatusCode
-	logResponse["URL"] = url
+	logData["Response"] = string(respBody)
+	logData["StatusCode"] = resp.StatusCode
 
 	if c.log != nil {
-		c.log.Info("Carma Response", logResponse)
+		c.log.Info("Carma Request", logResponse)
 	}
 
 	return
