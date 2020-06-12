@@ -102,7 +102,7 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 		carmaResp.err = err
 		if c.log != nil {
 			logData["error"] = err
-			c.log.Info("Carma Request", logData)
+			c.log.Debug("Carma Request", logData)
 		}
 		return
 	}
@@ -116,7 +116,7 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 		carmaResp.err = err
 		if c.log != nil {
 			logData["error"] = err
-			c.log.Info("Carma Request", logData)
+			c.log.Debug("Carma Request", logData)
 		}
 		return
 	}
@@ -135,12 +135,16 @@ func (c CarmaClient) carmaRequest(endpoint string, method string, body interface
 	var jsonResp interface{}
 	err = json.Unmarshal(respBody, &jsonResp)
 	if err == nil {
-		logData["Response"] = respBody
+		if len(respBody) > 10000 {
+			logData["Response"] = fmt.Sprintf("response data to large for log (>%d byte)", 10000)
+		} else {
+			logData["Response"] = respBody
+		}
 	}
 	logData["StatusCode"] = resp.StatusCode
 
 	if c.log != nil {
-		c.log.Info("Carma Request", logData)
+		c.log.Debug("Carma Request", logData)
 	}
 
 	return
